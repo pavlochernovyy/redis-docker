@@ -2,12 +2,11 @@
 description: Tear down the redis-docker stack (stop pub/sub, terraform destroy, remove images)
 ---
 
-Run:
+Before running, ask the user whether they also want to wipe the persisted data volumes (`redis-local-data`, `redisinsight-local-data`). Then run:
 
 ```bash
-./scripts/teardown.sh
+./scripts/teardown.sh          # keep data volumes
+./scripts/teardown.sh --volumes  # also wipe data volumes
 ```
-
-Pass `--volumes` (i.e. `./scripts/teardown.sh --volumes`) if the user wants to also wipe the persisted data volumes (`redis-local-data`, `redisinsight-local-data`).
 
 This already stops the pub/sub publisher, destroys the terraform-managed resources, and removes the redis/redisinsight docker images — no extra steps needed.

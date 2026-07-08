@@ -6,11 +6,6 @@ name: Test project (manual)
 # stand up a reachable environment, it just verifies the scripts work.
 on:
   workflow_dispatch:
-    inputs:
-      volumes:
-        description: "Teardown: also delete persisted data volumes (--volumes)"
-        type: boolean
-        default: false
 
 jobs:
   test-project:
@@ -36,9 +31,12 @@ jobs:
 
       - name: Teardown stack
         if: always()
-        run: |
-          if [[ "${{ inputs.volumes }}" == "true" ]]; then
-            ./scripts/teardown.sh --volumes
-          else
-            ./scripts/teardown.sh
-          fi
+        run: ./scripts/teardown.sh
+
+      - name: Upload pub/sub log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pubsub-log
+          path: .pubsub.log
+          if-no-files-found: ignore

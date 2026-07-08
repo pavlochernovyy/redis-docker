@@ -12,8 +12,12 @@ TF_DIR="$SCRIPT_DIR/../terraform"
 echo "Stopping pub/sub publisher (if running)..."
 "$SCRIPT_DIR/pubsub.sh" stop
 
-echo "Removing pub/sub logs..."
-rm -f "$SCRIPT_DIR/../.pubsub.log"
+if [[ "${CI:-}" == "true" ]]; then
+  echo "Running in CI — keeping .pubsub.log for the workflow to upload as an artifact."
+else
+  echo "Removing pub/sub logs..."
+  rm -f "$SCRIPT_DIR/../.pubsub.log"
+fi
 
 cd "$TF_DIR"
 terraform destroy -auto-approve

@@ -50,7 +50,7 @@ To add/change messages or channels, edit `seed/pubsub-messages.json` — no scri
 
 ## Teardown
 
-Run `/teardown` (see `.claude/commands/teardown.md`). It stops the pub/sub publisher, deletes `.pubsub.log`, destroys the terraform-managed resources, and removes the redis/redisinsight images. Add `--volumes` to also delete `redis-local-data` and `redisinsight-local-data`.
+Run `/teardown` (see `.claude/commands/teardown.md`). It stops the pub/sub publisher, deletes `.pubsub.log`, destroys the terraform-managed resources, and removes the redis/redisinsight images. Add `--volumes` to also delete `redis-local-data` and `redisinsight-local-data`. In CI (`$CI == true`), `.pubsub.log` is left in place instead of deleted, so the workflow can upload it as an artifact afterward.
 
 ## Notes for future changes
 
