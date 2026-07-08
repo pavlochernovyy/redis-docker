@@ -6,6 +6,7 @@
 #   pubsub.sh start [interval_sec]   start a background loop publishing 1 random message every interval (default 5s)
 #   pubsub.sh stop                   stop the background loop
 #   pubsub.sh status                 show whether the loop is running
+#   pubsub.sh logs                   print messages published so far by the background loop
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -71,13 +72,22 @@ cmd_status() {
   fi
 }
 
+cmd_logs() {
+  if [[ ! -f "$LOG_FILE" ]]; then
+    echo "No log file yet ($LOG_FILE) — has the publisher been started?"
+    exit 0
+  fi
+  cat "$LOG_FILE"
+}
+
 case "${1:-}" in
   publish) cmd_publish "${2:-2}" ;;
   start)   cmd_start "${2:-5}" ;;
   stop)    cmd_stop ;;
   status)  cmd_status ;;
+  logs)    cmd_logs ;;
   *)
-    echo "Usage: $0 {publish [count]|start [interval_sec]|stop|status}" >&2
+    echo "Usage: $0 {publish [count]|start [interval_sec]|stop|status|logs}" >&2
     exit 1
     ;;
 esac

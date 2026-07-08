@@ -1,0 +1,30 @@
+name: Bootstrap (manual)
+
+# Runs the bootstrap flow on demand from the Actions tab. GitHub-hosted
+# runners are ephemeral, so this is a smoke test that the stack (including
+# the pub/sub publisher) comes up cleanly end to end — nothing persists
+# after the job finishes. It is not a way to stand up a reachable Redis.
+on:
+  workflow_dispatch:
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - name: Bootstrap stack (with pub/sub publisher)
+        run: ./scripts/bootstrap.sh
+
+      - name: Verify Redis is reachable
+        run: docker exec redis-local redis-cli PING
+
+      - name: Verify pub/sub publisher is running and publishing
+        run: |
+          ./scripts/pubsub.sh status
+          sleep 12
+          ./scripts/pubsub.sh logs

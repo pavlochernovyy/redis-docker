@@ -12,6 +12,9 @@ TF_DIR="$SCRIPT_DIR/../terraform"
 echo "Stopping pub/sub publisher (if running)..."
 "$SCRIPT_DIR/pubsub.sh" stop
 
+echo "Removing pub/sub logs..."
+rm -f "$SCRIPT_DIR/../.pubsub.log"
+
 cd "$TF_DIR"
 terraform destroy -auto-approve
 

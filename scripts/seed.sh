@@ -15,4 +15,21 @@ echo "Seeding ${CONTAINER_NAME} from $(basename "$SEED_FILE")..."
 
 grep -v '^--' "$SEED_FILE" | grep -v '^\s*$' | docker exec -i "$CONTAINER_NAME" redis-cli --no-raw
 
+echo
+echo "Seeded data:"
+docker exec "$CONTAINER_NAME" redis-cli KEYS '*' | sort | while read -r key; do
+  [[ -z "$key" ]] && continue
+  type="$(docker exec "$CONTAINER_NAME" redis-cli TYPE "$key")"
+  case "$type" in
+    string) value="$(docker exec "$CONTAINER_NAME" redis-cli GET "$key")" ;;
+    list)   value="$(docker exec "$CONTAINER_NAME" redis-cli LRANGE "$key" 0 -1)" ;;
+    set)    value="$(docker exec "$CONTAINER_NAME" redis-cli SMEMBERS "$key")" ;;
+    hash)   value="$(docker exec "$CONTAINER_NAME" redis-cli HGETALL "$key")" ;;
+    zset)   value="$(docker exec "$CONTAINER_NAME" redis-cli ZRANGE "$key" 0 -1 WITHSCORES)" ;;
+    *)      value="<$type>" ;;
+  esac
+  echo "  $key ($type): $(echo "$value" | tr '\n' ' ')"
+done
+
+echo
 echo "Done. Verify with: docker exec -it ${CONTAINER_NAME} redis-cli KEYS '*'"
