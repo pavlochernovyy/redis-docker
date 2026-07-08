@@ -1,0 +1,44 @@
+name: Test project (manual)
+
+# Runs bootstrap then teardown in the same job, on demand from the Actions
+# tab, as an end-to-end smoke test of both flows together. GitHub-hosted
+# runners are ephemeral, so nothing persists after the job — this doesn't
+# stand up a reachable environment, it just verifies the scripts work.
+on:
+  workflow_dispatch:
+    inputs:
+      volumes:
+        description: "Teardown: also delete persisted data volumes (--volumes)"
+        type: boolean
+        default: false
+
+jobs:
+  test-project:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - name: Bootstrap stack (with pub/sub publisher)
+        run: ./scripts/bootstrap.sh
+
+      - name: Verify Redis is reachable
+        run: docker exec redis-local redis-cli PING
+
+      - name: Verify pub/sub publisher is running and publishing
+        run: |
+          ./scripts/pubsub.sh status
+          sleep 12
+          ./scripts/pubsub.sh logs
+
+      - name: Teardown stack
+        if: always()
+        run: |
+          if [[ "${{ inputs.volumes }}" == "true" ]]; then
+            ./scripts/teardown.sh --volumes
+          else
+            ./scripts/teardown.sh
+          fi
