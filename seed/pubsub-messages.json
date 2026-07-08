@@ -1,0 +1,54 @@
+{
+  "description": "Message pool for the pub/sub publisher tool. Each entry defines a channel and a payload template. The publisher picks entries at random and fills in a fresh id/timestamp on every publish.",
+  "messages": [
+    {
+      "channel": "notifications:user",
+      "payload": {
+        "type": "notification",
+        "title": "New login detected",
+        "body": "A new device just signed in to your account."
+      }
+    },
+    {
+      "channel": "notifications:user",
+      "payload": {
+        "type": "notification",
+        "title": "Password changed",
+        "body": "Your account password was updated successfully."
+      }
+    },
+    {
+      "channel": "events:orders",
+      "payload": {
+        "type": "order.created",
+        "order_id": "ord_{{random_id}}",
+        "amount": 42.5,
+        "currency": "USD"
+      }
+    },
+    {
+      "channel": "events:orders",
+      "payload": {
+        "type": "order.shipped",
+        "order_id": "ord_{{random_id}}",
+        "carrier": "UPS"
+      }
+    },
+    {
+      "channel": "logs:system",
+      "payload": {
+        "type": "log",
+        "level": "info",
+        "message": "Cache warmed successfully."
+      }
+    },
+    {
+      "channel": "chat:general",
+      "payload": {
+        "type": "chat.message",
+        "user": "ada",
+        "text": "Hey, is the new build deployed yet?"
+      }
+    }
+  ]
+}

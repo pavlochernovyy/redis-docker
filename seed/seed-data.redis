@@ -1,0 +1,22 @@
+-- Seed data for local Redis instance.
+-- Plain Redis command file, loaded via `redis-cli --pipe` or piped line-by-line.
+-- Covers a few common data types so RedisInsight has something to browse.
+
+SET user:1 "{\"id\":1,\"name\":\"Ada Lovelace\",\"email\":\"ada@example.com\"}"
+SET user:2 "{\"id\":2,\"name\":\"Alan Turing\",\"email\":\"alan@example.com\"}"
+SET user:3 "{\"id\":3,\"name\":\"Grace Hopper\",\"email\":\"grace@example.com\"}"
+
+HSET session:abc123 user_id 1 issued_at 1751500000 ttl 3600
+HSET session:def456 user_id 2 issued_at 1751500500 ttl 3600
+
+RPUSH queue:emails "welcome:1" "welcome:2" "welcome:3"
+
+SADD tags:redis "cache" "nosql" "in-memory"
+
+ZADD leaderboard 100 "ada" 90 "alan" 80 "grace"
+
+SET config:app_name "playwithclaude"
+SET config:env "local"
+
+EXPIRE session:abc123 3600
+EXPIRE session:def456 3600
