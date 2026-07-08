@@ -29,12 +29,16 @@ jobs:
           sleep 12
           ./scripts/pubsub.sh logs
 
+      - name: Copy pub/sub log for upload
+        if: always()
+        run: cp .pubsub.log pubsub.log 2>/dev/null || true
+
       - name: Upload pub/sub log
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: pubsub-log
-          path: .pubsub.log
+          path: pubsub.log
           if-no-files-found: ignore
 
       - name: Teardown stack

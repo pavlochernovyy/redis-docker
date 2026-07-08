@@ -12,7 +12,7 @@ Local Redis + RedisInsight stack, provisioned with Terraform (`kreuzwerker/docke
 - `scripts/pubsub_publish.py` — helper invoked by `pubsub.sh`; picks random messages from `seed/pubsub-messages.json` and publishes them via `redis-cli PUBLISH`.
 - `scripts/bootstrap.sh` — runs `terraform init`/`apply`, seeds data, and starts the pub/sub publisher (see Bootstrap below).
 - `scripts/teardown.sh` — stops the pub/sub publisher, runs `terraform destroy`, and removes redis/redisinsight images; pass `--volumes` to also wipe persisted data.
-- `.github/workflows/test-project.yml` — manually triggered (`workflow_dispatch`, "Run workflow" button in the Actions tab, available once merged to `master`) end-to-end smoke test: bootstrap (with pub/sub), verify Redis/publisher, upload `.pubsub.log` as a workflow artifact (`pubsub-log`), then teardown, all in one job. The upload runs *before* teardown since teardown deletes the log. GitHub-hosted runners are ephemeral, so nothing persists after the job — this doesn't stand up a reachable environment, it just verifies the scripts work end to end.
+- `.github/workflows/test-project.yml` — manually triggered (`workflow_dispatch`, "Run workflow" button in the Actions tab, available once merged to `master`) end-to-end smoke test: bootstrap (with pub/sub), verify Redis/publisher, copy `.pubsub.log` to a non-hidden `pubsub.log` and upload it as a workflow artifact (`pubsub-log` — `actions/upload-artifact` silently skips dotfiles, hence the copy), then teardown, all in one job. The upload runs *before* teardown since teardown deletes the log. GitHub-hosted runners are ephemeral, so nothing persists after the job — this doesn't stand up a reachable environment, it just verifies the scripts work end to end.
 
 ## Prerequisites
 
