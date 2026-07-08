@@ -12,7 +12,7 @@ Local Redis + RedisInsight stack, provisioned with Terraform (`kreuzwerker/docke
 - `scripts/pubsub_publish.py` — helper invoked by `pubsub.sh`; picks random messages from `seed/pubsub-messages.json` and publishes them via `redis-cli PUBLISH`.
 - `scripts/bootstrap.sh` — runs `terraform init`/`apply`, seeds data, and starts the pub/sub publisher (see Bootstrap below).
 - `scripts/teardown.sh` — stops the pub/sub publisher, runs `terraform destroy`, and removes redis/redisinsight images; pass `--volumes` to also wipe persisted data.
-- `.github/workflows/test-project.yml` — manually triggered (`workflow_dispatch`, "Run workflow" button in the Actions tab, available once merged to `master`) end-to-end smoke test: bootstrap (with pub/sub), verify Redis/publisher, then teardown, all in one job. GitHub-hosted runners are ephemeral, so nothing persists after the job — this doesn't stand up a reachable environment, it just verifies the scripts work end to end.
+- `.github/workflows/test-project.yml` — manually triggered (`workflow_dispatch`, "Run workflow" button in the Actions tab, available once merged to `master`) end-to-end smoke test: bootstrap (with pub/sub), verify Redis/publisher, upload `.pubsub.log` as a workflow artifact (`pubsub-log`), then teardown, all in one job. The upload runs *before* teardown since teardown deletes the log. GitHub-hosted runners are ephemeral, so nothing persists after the job — this doesn't stand up a reachable environment, it just verifies the scripts work end to end.
 
 ## Prerequisites
 
@@ -50,7 +50,7 @@ To add/change messages or channels, edit `seed/pubsub-messages.json` — no scri
 
 ## Teardown
 
-Run `/teardown` (see `.claude/commands/teardown.md`). It stops the pub/sub publisher, deletes `.pubsub.log`, destroys the terraform-managed resources, and removes the redis/redisinsight images. Add `--volumes` to also delete `redis-local-data` and `redisinsight-local-data`. In CI (`$CI == true`), `.pubsub.log` is left in place instead of deleted, so the workflow can upload it as an artifact afterward.
+Run `/teardown` (see `.claude/commands/teardown.md`). It stops the pub/sub publisher, deletes `.pubsub.log`, destroys the terraform-managed resources, and removes the redis/redisinsight images. Add `--volumes` to also delete `redis-local-data` and `redisinsight-local-data`. (In CI, `test-project.yml` uploads `.pubsub.log` as an artifact *before* calling teardown, so the deletion here doesn't lose it.)
 
 ## Notes for future changes
 
